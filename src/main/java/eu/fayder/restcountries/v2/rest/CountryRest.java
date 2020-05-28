@@ -278,7 +278,8 @@ public class CountryRest {
             "languages",
             "flag",
             "regionalBlocs",
-            "cioc"
+            "cioc",
+            "unicodeFlag"
     };
 
     private boolean isEmpty(String value) {

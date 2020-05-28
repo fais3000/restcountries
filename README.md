@@ -7,6 +7,7 @@ Differences from original
 * Packaged as a standalone micronaut service application
 * Removed /v1 API 
 * Removed /contribute API
+* Added `unicodeFlag` attribute
 
 Default port 5055
 
@@ -216,6 +217,7 @@ Response Example
 		"pt": "Colômbia"
 	},
 	"flag": "/data/col.svg",
+    "unicodeFlag": "🇨🇴",
 	"regionalBlocs": [{
 		"acronym": "PA",
 		"name": "Pacific Alliance",
