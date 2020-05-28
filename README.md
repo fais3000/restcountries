@@ -1,41 +1,14 @@
 REST Countries
 =======
 
-Get information about countries via a RESTful API https://restcountries.eu
+Forked from https://restcountries.eu 
 
-[![Build Status](https://travis-ci.org/fayder/restcountries.svg?branch=master)](https://travis-ci.org/fayder/restcountries)
+Differences from original
+* Packaged as a standalone micronaut service application
+* Removed /v1 API 
+* Removed /contribute API
 
-Donate!
----------------
-The restcountries project has been acquired by apilayer, one of the leading providers of API microservices. We will keep supporting restcountries and providing it as a free solution for developers. We will finance this project fully and have turned off the donations feature.
-
-Users
----------------
-RESTCountries has over 1200 users, including:
-
-[TTÜ]
-
-[Spotify International Pricing Index]
-
-[Gorillaz]
-
-[Wanderlust]
-
-[Xero]
-
-[FxPro]
-
-[SKROSS]
-
-[onefinestay]
-
-[Much Better Adventures]
-
-Stay up-to-date
----------------
-Follow RESTCountries on [Twitter]
-
-Or subscribe to the [mailing list]
+Default port 5055
 
 API Endpoints
 =======
@@ -46,7 +19,7 @@ All
 ---------------
 
 ``` html
-https://restcountries.eu/rest/v2/all
+/rest/v2/all
 ```
 
 Name
@@ -55,15 +28,15 @@ Name
 Search by country name. It can be the native name or partial name
 
 ``` javascript
-https://restcountries.eu/rest/v2/name/{name}
+/rest/v2/name/{name}
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/name/eesti
+/rest/v2/name/eesti
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/name/united
+/rest/v2/name/united
 ```
 
 Full Name
@@ -72,11 +45,11 @@ Full Name
 Search by country full name
 
 ``` javascript
-https://restcountries.eu/rest/v2/name/{name}?fullText=true
+/rest/v2/name/{name}?fullText=true
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/name/aruba?fullText=true
+/rest/v2/name/aruba?fullText=true
 ```
 
 Code
@@ -85,15 +58,15 @@ Code
 Search by ISO 3166-1 2-letter or 3-letter country code
 
 ``` javascript
-https://restcountries.eu/rest/v2/alpha/{code}
+/rest/v2/alpha/{code}
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/alpha/co
+/rest/v2/alpha/co
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/alpha/col
+/rest/v2/alpha/col
 ```
 
 List of codes
@@ -102,11 +75,11 @@ List of codes
 Search by list of ISO 3166-1 2-letter or 3-letter country codes
 
 ``` javascript
-https://restcountries.eu/rest/v2/alpha?codes={code};{code};{code}
+/rest/v2/alpha?codes={code};{code};{code}
 ```
 
 ``` html
-https://restcountries.eu/rest/v2/alpha?codes=col;no;ee
+/rest/v2/alpha?codes=col;no;ee
 ```
 
 Currency
@@ -115,10 +88,10 @@ Currency
 Search by ISO 4217 currency code
 
 ``` javascript
-https://restcountries.eu/rest/v2/currency/{currency}
+/rest/v2/currency/{currency}
 ```
 ``` html
-https://restcountries.eu/rest/v2/currency/cop
+/rest/v2/currency/cop
 ```
 
 Language
@@ -127,10 +100,10 @@ Language
 Search by ISO 639-1 language code
 
 ``` javascript
-https://restcountries.eu/rest/v2/lang/{et}
+/rest/v2/lang/{et}
 ```
 ``` html
-https://restcountries.eu/rest/v2/lang/es
+/rest/v2/lang/es
 ```
 
 Capital city
@@ -139,10 +112,10 @@ Capital city
 Search by capital city
 
 ``` javascript
-https://restcountries.eu/rest/v2/capital/{capital}
+/rest/v2/capital/{capital}
 ```
 ``` html
-https://restcountries.eu/rest/v2/capital/tallinn
+/rest/v2/capital/tallinn
 ```
 
 Calling code
@@ -151,10 +124,10 @@ Calling code
 Search by calling code
 
 ``` javascript
-https://restcountries.eu/rest/v2/callingcode/{callingcode}
+/rest/v2/callingcode/{callingcode}
 ```
 ``` html
-https://restcountries.eu/rest/v2/callingcode/372
+/rest/v2/callingcode/372
 ```
 
 Region
@@ -163,10 +136,10 @@ Region
 Search by region: Africa, Americas, Asia, Europe, Oceania
 
 ``` javascript
-https://restcountries.eu/rest/v2/region/{region}
+/rest/v2/region/{region}
 ```
 ``` html
-https://restcountries.eu/rest/v2/region/europe
+/rest/v2/region/europe
 ```
 
 Regional Bloc
@@ -189,17 +162,17 @@ Search by regional bloc:
 - SAARC (South Asian Association for Regional Cooperation)
 
 ``` javascript
-https://restcountries.eu/rest/v2/regionalbloc/{regionalbloc}
+/rest/v2/regionalbloc/{regionalbloc}
 ```
 ``` html
-https://restcountries.eu/rest/v2/regionalbloc/eu
+/rest/v2/regionalbloc/eu
 ```
 
 Response Example
 ---------------
 
 ``` html
-https://restcountries.eu/rest/v2/alpha/col
+/rest/v2/alpha/col
 ```
 
 ``` json
@@ -242,7 +215,7 @@ https://restcountries.eu/rest/v2/alpha/col
 		"br": "Colômbia",
 		"pt": "Colômbia"
 	},
-	"flag": "https://restcountries.eu/data/col.svg",
+	"flag": "/data/col.svg",
 	"regionalBlocs": [{
 		"acronym": "PA",
 		"name": "Pacific Alliance",
@@ -263,10 +236,10 @@ Filter Response
 You can filter the output of your request to include only the specified fields.
 
 ``` javascript
-https://restcountries.eu/rest/v2/{service}?fields={field};{field};{field}
+/rest/v2/{service}?fields={field};{field};{field}
 ```
 ``` html
-https://restcountries.eu/rest/v2/all?fields=name;capital;currencies
+/rest/v2/all?fields=name;capital;currencies
 ```
 
 Sources

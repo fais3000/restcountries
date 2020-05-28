@@ -3,6 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.fayder.restcountries.v2.domain;
 
+import io.micronaut.core.annotation.Introspected;
+
+@Introspected
 public class Currency {
 
     private String code;

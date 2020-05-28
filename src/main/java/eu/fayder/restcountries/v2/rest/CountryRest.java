@@ -3,277 +3,249 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.fayder.restcountries.v2.rest;
 
-import com.google.gson.*;
-import eu.fayder.restcountries.domain.ResponseEntity;
-import eu.fayder.restcountries.v2.domain.Country;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import eu.fayder.restcountries.domain.ICountryRestSymbols;
-import org.apache.log4j.Logger;
+import eu.fayder.restcountries.v2.domain.Country;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.Produces;
+import io.micronaut.http.annotation.QueryValue;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Provider
-@Path("/v2")
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+@Slf4j
+@Controller("/v2")
+@Produces(MediaType.APPLICATION_JSON)
 public class CountryRest {
+    private final CountryService countryService;
+    private final ObjectMapper objectMapper;
 
-    private static final Logger LOG = Logger.getLogger(CountryRest.class);
+    public CountryRest(CountryService countryService, ObjectMapper objectMapper) {
+        this.countryService = countryService;
+        this.objectMapper = objectMapper;
+    }
 
-    @GET
-    @Path("all")
-    public Object getAllCountries(@QueryParam("fields") String fields) {
+    @Get("all")
+    public JsonNode getAllCountries(@QueryValue("fields") @Nullable String fields) {
         return this.getCountries(fields);
     }
 
-    @GET
-    public Object getCountries(@QueryParam("fields") String fields) {
-        LOG.info("Getting all");
-        List<Country> countries = CountryService.getInstance().getAll();
+    @Get
+    public JsonNode getCountries(@QueryValue("fields") @Nullable String fields) {
+        log.info("Getting all");
+        List<Country> countries = this.countryService.getAll();
         return parsedCountries(countries, fields);
     }
 
-    @GET
-    @Path("alpha/{alphacode}")
-    public Object getByAlpha(@PathParam("alphacode") String alpha, @QueryParam("fields") String fields) {
-        LOG.info("Getting by alpha " + alpha);
+    @Get("alpha/{alphacode}")
+    public HttpResponse<JsonNode> getByAlpha(@PathVariable("alphacode") String alpha, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by alpha " + alpha);
         if (isEmpty(alpha) || alpha.length() < 2 || alpha.length() > 3) {
-            return getResponse(Response.Status.BAD_REQUEST);
+            return HttpResponse.badRequest();
         }
-        Country country = CountryService.getInstance().getByAlpha(alpha);
+        Country country = this.countryService.getByAlpha(alpha);
         if (country != null) {
-            return parsedCountry(country, fields);
+            return HttpResponse.ok(parsedCountry(country, fields));
         }
-        return getResponse(Response.Status.NOT_FOUND);
+        return HttpResponse.notFound();
     }
 
-    @GET
-    @Path("alpha/")
-    public Object getByAlphaList(@QueryParam("codes") String codes, @QueryParam("fields") String fields) {
-        LOG.info("Getting by list " + codes);
+    @Get("alpha/")
+    public HttpResponse<JsonNode> getByAlphaList(@QueryValue("codes") String codes, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by list " + codes);
         if (isEmpty(codes) || codes.length() < 2 || (codes.length() > 3 && !codes.contains(";"))) {
-            return getResponse(Response.Status.BAD_REQUEST);
+            return HttpResponse.badRequest();
         }
         try {
-            List<Country> countries = CountryService.getInstance().getByCodeList(codes);
+            List<Country> countries = this.countryService.getByCodeList(codes);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("currency/{currency}")
-    public Object getByCurrency(@PathParam("currency") String currency, @QueryParam("fields") String fields) {
-        LOG.info("Getting by currency " + currency);
+    @Get("currency/{currency}")
+    public HttpResponse<JsonNode> getByCurrency(@PathVariable("currency") String currency, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by currency " + currency);
         if (isEmpty(currency) || currency.length() != 3) {
-            return getResponse(Response.Status.BAD_REQUEST);
+            return HttpResponse.badRequest();
         }
         try {
-            List<Country> countries = CountryService.getInstance().getByCurrency(currency);
+            List<Country> countries = this.countryService.getByCurrency(currency);
+            if (!countries.isEmpty()) {
+                return HttpResponse.ok(parsedCountries(countries, fields));
+            }
+            return HttpResponse.notFound();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
+        }
+    }
+
+    @Get("name/{name}")
+    public Object getByName(@PathVariable("name") String name, @QueryValue("fullText") @Nullable Boolean fullText, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by name " + name);
+        try {
+            List<Country> countries = this.countryService.getByName(name, fullText);
             if (!countries.isEmpty()) {
                 return parsedCountries(countries, fields);
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("name/{name}")
-    public Object getByName(@PathParam("name") String name, @QueryParam("fullText") boolean fullText, @QueryParam("fields") String fields) {
-        LOG.info("Getting by name " + name);
+    @Get("callingcode/{callingcode}")
+    public HttpResponse<JsonNode> getByCallingCode(@PathVariable("callingcode") String callingcode, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by calling code " + callingcode);
         try {
-            List<Country> countries = CountryService.getInstance().getByName(name, fullText);
+            List<Country> countries = this.countryService.getByCallingCode(callingcode);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("callingcode/{callingcode}")
-    public Object getByCallingCode(@PathParam("callingcode") String callingcode, @QueryParam("fields") String fields) {
-        LOG.info("Getting by calling code " + callingcode);
+    @Get("capital/{capital}")
+    public HttpResponse<JsonNode> getByCapital(@PathVariable("capital") String capital, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by capital " + capital);
         try {
-            List<Country> countries = CountryService.getInstance().getByCallingCode(callingcode);
+            List<Country> countries = this.countryService.getByCapital(capital);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("capital/{capital}")
-    public Object getByCapital(@PathParam("capital") String capital, @QueryParam("fields") String fields) {
-        LOG.info("Getting by capital " + capital);
+    @Get("region/{region}")
+    public HttpResponse<JsonNode>  getByRegion(@PathVariable("region") String region, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by region " + region);
         try {
-            List<Country> countries = CountryService.getInstance().getByCapital(capital);
+            List<Country> countries = this.countryService.getByRegion(region);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("region/{region}")
-    public Object getByRegion(@PathParam("region") String region, @QueryParam("fields") String fields) {
-        LOG.info("Getting by region " + region);
+    @Get("subregion/{subregion}")
+    public HttpResponse<JsonNode>  getBySubRegion(@PathVariable("subregion") String subregion, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by sub region " + subregion);
         try {
-            List<Country> countries = CountryService.getInstance().getByRegion(region);
+            List<Country> countries = this.countryService.getBySubRegion(subregion);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("subregion/{subregion}")
-    public Object getBySubRegion(@PathParam("subregion") String subregion, @QueryParam("fields") String fields) {
-        LOG.info("Getting by sub region " + subregion);
+    @Get("lang/{lang}")
+    public HttpResponse<JsonNode>  getByLanguage(@PathVariable("lang") String language, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by language " + language);
         try {
-            List<Country> countries = CountryService.getInstance().getBySubRegion(subregion);
+            List<Country> countries = this.countryService.getByLanguage(language);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("lang/{lang}")
-    public Object getByLanguage(@PathParam("lang") String language, @QueryParam("fields") String fields) {
-        LOG.info("Getting by language " + language);
+    @Get("demonym/{demonym}")
+    public HttpResponse<JsonNode>  getByDemonym(@PathVariable("demonym") String demonym, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by demonym " + demonym);
         try {
-            List<Country> countries = CountryService.getInstance().getByLanguage(language);
+            List<Country> countries = this.countryService.getByDemonym(demonym);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("demonym/{demonym}")
-    public Object getByDemonym(@PathParam("demonym") String demonym, @QueryParam("fields") String fields) {
-        LOG.info("Getting by demonym " + demonym);
+    @Get("regionalbloc/{regionalbloc}")
+    public HttpResponse<JsonNode>  getByRegionalBloc(@PathVariable("regionalbloc") String regionalBlock, @QueryValue("fields") @Nullable String fields) {
+        log.info("Getting by regional bloc " + regionalBlock);
         try {
-            List<Country> countries = CountryService.getInstance().getByDemonym(demonym);
+            List<Country> countries = this.countryService.getByRegionalBloc(regionalBlock);
             if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
+                return HttpResponse.ok(parsedCountries(countries, fields));
             }
-            return getResponse(Response.Status.NOT_FOUND);
+            return HttpResponse.notFound();
         } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
+            log.error(e.getMessage(), e);
+            return HttpResponse.serverError();
         }
     }
 
-    @GET
-    @Path("regionalbloc/{regionalbloc}")
-    public Object getByRegionalBloc(@PathParam("regionalbloc") String regionalBlock, @QueryParam("fields") String fields) {
-        LOG.info("Getting by regional bloc " + regionalBlock);
-        try {
-            List<Country> countries = CountryService.getInstance().getByRegionalBloc(regionalBlock);
-            if (!countries.isEmpty()) {
-                return parsedCountries(countries, fields);
-            }
-            return getResponse(Response.Status.NOT_FOUND);
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-            return getResponse(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @POST
-    public Object doPOST() {
-        LOG.info("Handling POST Request");
-        return getResponse(Response.Status.METHOD_NOT_ALLOWED);
-    }
-
-    private Response getResponse(Response.Status status) {
-        Gson gson = new Gson();
-        return Response
-                .status(status)
-                .entity(gson.toJson(new ResponseEntity(status.getStatusCode(),
-                        status.getReasonPhrase()))).build();
-    }
-
-    private Object parsedCountry(Country country, String fields) {
+    private JsonNode parsedCountry(Country country, String fields) {
         if (fields == null || fields.isEmpty()) {
-            return country;
+            return objectMapper.valueToTree(country);
         } else {
             return getCountryJson(country, Arrays.asList(fields.split(ICountryRestSymbols.SEMICOLON)));
         }
     }
 
-    private Object parsedCountries(List<Country> countries, String excludedFields) {
+    private JsonNode parsedCountries(List<Country> countries, String excludedFields) {
         if (excludedFields == null || excludedFields.isEmpty()) {
-            return countries;
+            return objectMapper.valueToTree(countries);
         } else {
             return getCountriesJson(countries, Arrays.asList(excludedFields.split(ICountryRestSymbols.SEMICOLON)));
         }
     }
 
-    private String getCountryJson(Country country, List<String> fields) {
-        Gson gson = new Gson();
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = parser.parse(gson.toJson(country)).getAsJsonObject();
-
+    private JsonNode getCountryJson(Country country, List<String> fields) {
+        JsonNode countryNode = objectMapper.valueToTree(country);
         List<String> excludedFields = getExcludedFields(fields);
-        for (String field : excludedFields) {
-            jsonObject.remove(field);
-        }
-        return jsonObject.toString();
+        excludedFields.forEach(field -> ((ObjectNode)countryNode).remove(field));
+        return countryNode;
     }
 
-    private String getCountriesJson(List<Country> countries, List<String> fields) {
-        Gson gson = new Gson();
-        JsonParser parser = new JsonParser();
-        JsonArray jsonArray = parser.parse(gson.toJson(countries)).getAsJsonArray();
-        JsonArray resultArray = new JsonArray();
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JsonObject jsonObject = (JsonObject) jsonArray.get(i);
-
-            List<String> excludedFields = getExcludedFields(fields);
-            for (String excludedField : excludedFields) {
-                jsonObject.remove(excludedField);
-            }
-            resultArray.add(jsonObject);
-        }
-        return resultArray.toString();
+    private JsonNode getCountriesJson(List<Country> countries, List<String> fields) {
+        ArrayNode result = objectMapper.createArrayNode();
+        countries.forEach(country -> {
+            JsonNode countryJson = getCountryJson(country, fields);
+            result.add(countryJson);
+        });
+        return result;
     }
 
     private List<String> getExcludedFields(List<String> fields) {

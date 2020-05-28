@@ -3,33 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.fayder.restcountries.v2.rest;
 
-import eu.fayder.restcountries.v2.domain.Country;
-import eu.fayder.restcountries.v2.domain.Language;
 import eu.fayder.restcountries.rest.CountryServiceBase;
+import eu.fayder.restcountries.v2.domain.Country;
 import eu.fayder.restcountries.v2.domain.Currency;
+import eu.fayder.restcountries.v2.domain.Language;
 import eu.fayder.restcountries.v2.domain.RegionalBloc;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
+@Singleton
 public class CountryService extends CountryServiceBase {
 
-    private static final Logger LOG = Logger.getLogger(CountryService.class);
-
     private static List<Country> countries;
-
-    private CountryService() {
-        initialize();
-    }
-
-    private static class InstanceHolder {
-        private static final CountryService INSTANCE = new CountryService();
-    }
-
-    public static CountryService getInstance() {
-        return InstanceHolder.INSTANCE;
-    }
 
     public List<Country> getAll() {
         return countries;
@@ -45,7 +35,7 @@ public class CountryService extends CountryServiceBase {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Country> getByName(String name, boolean isFullText) {
+    public List<Country> getByName(String name, Boolean isFullText) {
         return (List<Country>) super.getByName(name, isFullText, countries);
     }
 
@@ -126,6 +116,7 @@ public class CountryService extends CountryServiceBase {
         return result;
     }
 
+    @PostConstruct
     @SuppressWarnings("unchecked")
     private void initialize() {
         countries = (List<Country>) super.loadJson("countriesV2.json", Country.class);

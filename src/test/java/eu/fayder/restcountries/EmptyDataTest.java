@@ -3,36 +3,35 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.fayder.restcountries;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.fayder.restcountries.domain.BaseCountry;
-import org.junit.Before;
-import org.junit.Test;
+import eu.fayder.restcountries.v2.domain.Country;
+import io.micronaut.test.annotation.MicronautTest;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
+@MicronautTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class EmptyDataTest {
 
-    List<BaseCountry> countries;
+    List<Country> countries;
 
-    @Before
+    @Inject
+    private ObjectMapper objectMapper;
+
+    @BeforeAll
     public void before() throws IOException {
-        InputStream is = this.getClass().getClassLoader()
-                .getResourceAsStream("countriesV2.json");
-        Gson gson = new Gson();
-        JsonReader reader = new JsonReader(new InputStreamReader(is, "UTF-8"));
-        countries = new ArrayList<>();
-        reader.beginArray();
-        while (reader.hasNext()) {
-            BaseCountry country = gson.fromJson(reader, BaseCountry.class);
-            countries.add(country);
+        try (InputStream is = this.getClass().getClassLoader()
+                .getResourceAsStream("countriesV2.json")) {
+            countries = objectMapper.readValue(is, new TypeReference<List<Country>>(){});
         }
-        reader.endArray();
-        reader.close();
     }
 
     @Test

@@ -3,22 +3,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.fayder.restcountries.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.fayder.restcountries.domain.BaseCountry;
 import eu.fayder.restcountries.domain.ICountryRestSymbols;
-import org.apache.log4j.Logger;
+import eu.fayder.restcountries.v2.domain.Country;
+import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class CountryServiceBase {
-
-    private static final Logger LOG = Logger.getLogger(CountryServiceBase.class);
+    @Inject
+    private ObjectMapper objectMapper;
 
     protected <T extends BaseCountry> T getByAlpha(String alpha, List<T> countries) {
         int alphaLength = alpha.length();
@@ -49,8 +51,8 @@ public class CountryServiceBase {
         return result;
     }
 
-    protected List<? extends BaseCountry> getByName(String name, boolean fullText, List<? extends BaseCountry> countries) {
-        if(fullText) {
+    protected List<? extends BaseCountry> getByName(String name, Boolean fullText, List<? extends BaseCountry> countries) {
+        if(Boolean.TRUE.equals(fullText)) {
             return fulltextSearch(name, countries);
         } else {
             return substringSearch(name, countries);
@@ -142,20 +144,12 @@ public class CountryServiceBase {
     }
 
     protected List<? extends BaseCountry> loadJson(String filename, Class<? extends BaseCountry> clazz) {
-        LOG.debug("Loading JSON " + filename);
+        log.debug("Loading JSON " + filename);
         List<BaseCountry> countries = new ArrayList<>();
-        InputStream is = CountryServiceBase.class.getClassLoader().getResourceAsStream(filename);
-        Gson gson = new Gson();
-        JsonReader reader;
-        try {
-            reader = new JsonReader(new InputStreamReader(is, "UTF-8"));
-            reader.beginArray();
-            while(reader.hasNext()) {
-                BaseCountry country = gson.fromJson(reader, clazz);
-                countries.add(country);
-            }
+        try (InputStream is = CountryServiceBase.class.getClassLoader().getResourceAsStream(filename)) {
+            return objectMapper.readValue(is, new TypeReference<List<Country>>(){});
         } catch (Exception e) {
-            LOG.error("Could not load JSON " + filename);
+            log.error("Could not load JSON " + filename);
         }
         return countries;
     }

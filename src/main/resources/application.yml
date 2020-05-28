@@ -1,0 +1,17 @@
+micronaut:
+  application:
+    name: restcountries
+  server:
+    port: 5055
+    cors:
+      enabled: true
+      configurations:
+          all:
+            allowedOrigins:
+              - "*"
+            allowedMethods:
+              - GET
+            allowedHeaders:
+              - Accept
+              - X-Requested-With
+            maxAge: 86400

@@ -4,9 +4,11 @@
 package eu.fayder.restcountries.v2.domain;
 
 import eu.fayder.restcountries.domain.BaseCountry;
+import io.micronaut.core.annotation.Introspected;
 
 import java.util.List;
 
+@Introspected
 public class Country extends BaseCountry {
 
     private List<Currency> currencies;

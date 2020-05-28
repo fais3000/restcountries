@@ -1,11 +1,14 @@
 package eu.fayder.restcountries.v2.domain;
 
+import io.micronaut.core.annotation.Introspected;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by fayder on 30/04/2017.
  */
+@Introspected
 public class RegionalBloc {
 
     private String acronym;
