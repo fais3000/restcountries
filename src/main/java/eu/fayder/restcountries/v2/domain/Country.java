@@ -7,13 +7,14 @@ import eu.fayder.restcountries.domain.BaseCountry;
 import io.micronaut.core.annotation.Introspected;
 
 import java.util.List;
+import java.util.Map;
 
 @Introspected
 public class Country extends BaseCountry {
 
     private List<Currency> currencies;
     private List<Language> languages;
-    private Translations translations;
+    private Map<String, String> translations;
     private String flag;
     private List<RegionalBloc> regionalBlocs;
     private String cioc;
@@ -26,7 +27,7 @@ public class Country extends BaseCountry {
         return languages;
     }
 
-    public Translations getTranslations() {
+    public Map<String, String> getTranslations() {
         return translations;
     }
 

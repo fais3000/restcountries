@@ -4,7 +4,6 @@ import eu.fayder.restcountries.v2.domain.Country;
 import eu.fayder.restcountries.v2.domain.Currency;
 import eu.fayder.restcountries.v2.domain.Language;
 import eu.fayder.restcountries.v2.domain.RegionalBloc;
-import eu.fayder.restcountries.v2.domain.Translations;
 import eu.fayder.restcountries.v2.rest.CountryService;
 import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @MicronautTest
 public class CountryServiceTest {
@@ -181,13 +181,13 @@ public class CountryServiceTest {
     public void translations() throws Exception {
         Country country = countryService.getByAlpha("COL");
         Assertions.assertNotNull(country);
-        Translations translations = country.getTranslations();
-        Assertions.assertEquals("Kolumbien", translations.getDe());
-        Assertions.assertEquals("Colombia", translations.getEs());
-        Assertions.assertEquals("Colombie", translations.getFr());
-        Assertions.assertEquals("コロンビア", translations.getJa());
-        Assertions.assertEquals("Colombia", translations.getIt());
-        Assertions.assertEquals("Colômbia", translations.getBr());
-        Assertions.assertEquals("Colômbia", translations.getPt());
+        Map<String, String> translations = country.getTranslations();
+        Assertions.assertEquals("Kolumbien", translations.get("de"));
+        Assertions.assertEquals("Colombia", translations.get("es"));
+        Assertions.assertEquals("Colombie", translations.get("fr"));
+        Assertions.assertEquals("コロンビア", translations.get("ja"));
+        Assertions.assertEquals("Colombia", translations.get("it"));
+        Assertions.assertEquals("Colômbia", translations.get("br"));
+        Assertions.assertEquals("Colômbia", translations.get("pt"));
     }
 }
