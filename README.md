@@ -244,6 +244,21 @@ You can filter the output of your request to include only the specified fields.
 /rest/v2/all?fields=name;capital;currencies
 ```
 
+Update Tool
+=======
+
+Use scripts in `dataupdate` directory download updated country data from  [https://github.com/mledoze/countries] and language code mapping data from [https://datahub.io/core/language-codes]. Requires Node.js and cUrl.
+
+Currently it updates only country name translations.
+
+ ```bash
+cd dataupdate
+./update.sh 
+ ```
+ 
+Review the changes in `src/main/java/resources/countriesV2.json` and commit changes.
+ 
+
 Sources
 =======
 * [@mledoze]

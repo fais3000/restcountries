@@ -9,3 +9,5 @@ backup/
 .idea/
 *.iml
 google*.html
+dataupdate/lcc.json
+dataupdate/source.json
