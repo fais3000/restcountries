@@ -16,11 +16,18 @@ API Endpoints
 
 Below are described the REST endpoints available that you can use to search for countries
 
+Health Check
+--------------
+
+```
+/health
+```
+
 All
 ---------------
 
 ``` html
-/rest/v2/all
+/v2/all
 ```
 
 Name
@@ -29,15 +36,15 @@ Name
 Search by country name. It can be the native name or partial name
 
 ``` javascript
-/rest/v2/name/{name}
+/v2/name/{name}
 ```
 
 ``` html
-/rest/v2/name/eesti
+/v2/name/eesti
 ```
 
 ``` html
-/rest/v2/name/united
+/v2/name/united
 ```
 
 Full Name
@@ -46,11 +53,11 @@ Full Name
 Search by country full name
 
 ``` javascript
-/rest/v2/name/{name}?fullText=true
+/v2/name/{name}?fullText=true
 ```
 
 ``` html
-/rest/v2/name/aruba?fullText=true
+/v2/name/aruba?fullText=true
 ```
 
 Code
@@ -59,15 +66,15 @@ Code
 Search by ISO 3166-1 2-letter or 3-letter country code
 
 ``` javascript
-/rest/v2/alpha/{code}
+/v2/alpha/{code}
 ```
 
 ``` html
-/rest/v2/alpha/co
+/v2/alpha/co
 ```
 
 ``` html
-/rest/v2/alpha/col
+/v2/alpha/col
 ```
 
 List of codes
@@ -76,11 +83,11 @@ List of codes
 Search by list of ISO 3166-1 2-letter or 3-letter country codes
 
 ``` javascript
-/rest/v2/alpha?codes={code};{code};{code}
+/v2/alpha?codes={code};{code};{code}
 ```
 
 ``` html
-/rest/v2/alpha?codes=col;no;ee
+/v2/alpha?codes=col;no;ee
 ```
 
 Currency
@@ -89,10 +96,10 @@ Currency
 Search by ISO 4217 currency code
 
 ``` javascript
-/rest/v2/currency/{currency}
+/v2/currency/{currency}
 ```
 ``` html
-/rest/v2/currency/cop
+/v2/currency/cop
 ```
 
 Language
@@ -101,10 +108,10 @@ Language
 Search by ISO 639-1 language code
 
 ``` javascript
-/rest/v2/lang/{et}
+/v2/lang/{et}
 ```
 ``` html
-/rest/v2/lang/es
+/v2/lang/es
 ```
 
 Capital city
@@ -113,10 +120,10 @@ Capital city
 Search by capital city
 
 ``` javascript
-/rest/v2/capital/{capital}
+/v2/capital/{capital}
 ```
 ``` html
-/rest/v2/capital/tallinn
+/v2/capital/tallinn
 ```
 
 Calling code
@@ -125,10 +132,10 @@ Calling code
 Search by calling code
 
 ``` javascript
-/rest/v2/callingcode/{callingcode}
+/v2/callingcode/{callingcode}
 ```
 ``` html
-/rest/v2/callingcode/372
+/v2/callingcode/372
 ```
 
 Region
@@ -137,10 +144,10 @@ Region
 Search by region: Africa, Americas, Asia, Europe, Oceania
 
 ``` javascript
-/rest/v2/region/{region}
+/v2/region/{region}
 ```
 ``` html
-/rest/v2/region/europe
+/v2/region/europe
 ```
 
 Regional Bloc
@@ -163,17 +170,17 @@ Search by regional bloc:
 - SAARC (South Asian Association for Regional Cooperation)
 
 ``` javascript
-/rest/v2/regionalbloc/{regionalbloc}
+/v2/regionalbloc/{regionalbloc}
 ```
 ``` html
-/rest/v2/regionalbloc/eu
+/v2/regionalbloc/eu
 ```
 
 Response Example
 ---------------
 
 ``` html
-/rest/v2/alpha/col
+/v2/alpha/col
 ```
 
 ``` json
@@ -238,10 +245,10 @@ Filter Response
 You can filter the output of your request to include only the specified fields.
 
 ``` javascript
-/rest/v2/{service}?fields={field};{field};{field}
+/v2/{service}?fields={field};{field};{field}
 ```
 ``` html
-/rest/v2/all?fields=name;capital;currencies
+/v2/all?fields=name;capital;currencies
 ```
 
 Update Tool
