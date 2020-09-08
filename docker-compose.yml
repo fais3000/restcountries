@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  restcountries:
+    build:
+      context: .
+    container_name: restcountries
+    ports:
+        - 5055:5055

@@ -1,15 +1,27 @@
 REST Countries
 =======
 
-Forked from https://restcountries.eu 
+Forked from https://restcountries.eu
 
 Differences from original
 * Packaged as a standalone micronaut service application
-* Removed /v1 API 
+* Removed /v1 API
 * Removed /contribute API
 * Added `unicodeFlag` attribute
 
 Default port 5055
+
+
+How to Deploy
+=======
+* Download JDK https://www.oracle.com/java/technologies/javase-downloads.html
+* Download and set paths for Maven https://maven.apache.org/download.cgi https://maven.apache.org/install.html
+* Run following to generate target jar files for Docker Container
+```./mvnw clean install```
+
+* Build and start the container by running following
+```docker-compose up --build```
+* Access at http://localhost:5050
 
 API Endpoints
 =======
@@ -260,11 +272,11 @@ Currently it updates only country name translations.
 
  ```bash
 cd dataupdate
-./update.sh 
+./update.sh
  ```
- 
+
 Review the changes in `src/main/java/resources/countriesV2.json` and commit changes.
- 
+
 
 Sources
 =======
